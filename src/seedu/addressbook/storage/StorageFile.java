@@ -2,6 +2,7 @@ package seedu.addressbook.storage;
 
 import seedu.addressbook.data.AddressBook;
 import seedu.addressbook.data.exception.IllegalValueException;
+import seedu.addressbook.storage.StorageFile.StorageOperationException;
 import seedu.addressbook.storage.jaxb.AdaptedAddressBook;
 
 import javax.xml.bind.JAXBContext;
@@ -9,6 +10,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -88,14 +90,14 @@ public class StorageFile {
         /* Note: Note the 'try with resource' statement below.
          * More info: https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html
          */
+    	
         try (final Writer fileWriter =
                      new BufferedWriter(new FileWriter(path.toFile()))) {
-
             final AdaptedAddressBook toSave = new AdaptedAddressBook(addressBook);
             final Marshaller marshaller = jaxbContext.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             marshaller.marshal(toSave, fileWriter);
-
+            
         } catch (IOException ioe) {
             throw new StorageOperationException("Error writing to file: " + path);
         } catch (JAXBException jaxbe) {
@@ -103,7 +105,8 @@ public class StorageFile {
         }
     }
 
-    /**
+
+	/**
      * Loads data from this storage file.
      *
      * @throws StorageOperationException if there were errors reading and/or converting data from file.
@@ -140,9 +143,23 @@ public class StorageFile {
             throw new StorageOperationException("File contains illegal data values; data type constraints not met");
         }
     }
-
+    
     public String getPath() {
         return path.toString();
     }
-
+    
+    public void checkFileStillPresent() throws FileNotFoundException {
+		if (!Files.exists(path)) {
+			throw new FileNotFoundException("Error: Storage file has been deleted.");
+		}
+		
+	}
+    
+    public void recreateStorageFile(AddressBook addressBook) throws StorageOperationException {
+    	try (final Writer fileWriter =
+                new BufferedWriter(new FileWriter(path.toFile()))) {	
+    	} catch (IOException e) {
+    		throw new StorageOperationException("Error writing to file: " + path);
+		}
+	}
 }

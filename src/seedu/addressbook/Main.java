@@ -9,6 +9,8 @@ import seedu.addressbook.parser.Parser;
 import seedu.addressbook.storage.StorageFile;
 import seedu.addressbook.ui.TextUi;
 
+import java.io.FileNotFoundException;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +32,8 @@ public class Main {
     /** The list of person shown to the user most recently.  */
     private List<? extends ReadOnlyPerson> lastShownList = Collections.emptyList();
 
-
+    public static final String FILE_RECREATED_MESSAGE = "Storage file has been recreated.";
+    
     public static void main(String... launchArgs) {
         new Main().run(launchArgs);
     }
@@ -105,17 +108,32 @@ public class Main {
      */
     private CommandResult executeCommand(Command command)  {
         try {
+        	storage.checkFileStillPresent();
             command.setData(addressBook, lastShownList);
-            CommandResult result = command.execute();
+            CommandResult result = command.execute(); 
             storage.save(addressBook);
             return result;
+        } catch (FileNotFoundException e) {
+        	return resolveDeletedStorageFile(command, e);
         } catch (Exception e) {
             ui.showToUser(e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
-    /**
+	private CommandResult resolveDeletedStorageFile(Command command, FileNotFoundException errorMessage) {
+		try {
+			ui.showToUser(errorMessage.getMessage());
+			storage.recreateStorageFile(addressBook);
+			ui.showToUser(FILE_RECREATED_MESSAGE);
+			return executeCommand(command);
+		} catch (StorageOperationException e) {
+            ui.showToUser(e.getMessage());
+            throw new RuntimeException(e);
+        }
+	}
+    
+	/**
      * Creates the StorageFile object based on the user specified path (if any) or the default storage path.
      * @param launchArgs arguments supplied by the user at program launch
      * @throws InvalidStorageFilePathException if the target file path is incorrect.
@@ -124,6 +142,6 @@ public class Main {
         boolean isStorageFileSpecifiedByUser = launchArgs.length > 0;
         return isStorageFileSpecifiedByUser ? new StorageFile(launchArgs[0]) : new StorageFile();
     }
-
+   
 
 }
