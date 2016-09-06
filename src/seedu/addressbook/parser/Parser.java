@@ -26,7 +26,8 @@ public class Parser {
                     + " (?<isEmailPrivate>p?)e/(?<email>[^/]+)"
                     + " (?<isAddressPrivate>p?)a/(?<address>[^/]+)"
                     + "(?<tagArguments>(?: t/[^/]+)*)"); // variable number of tags
-
+    
+    public static final Pattern TAG_ARGS_FORMAT = Pattern.compile("(?<toAdd>[+-]) i/(?<index>[\\d]+) t/(?<tag>[^/]+)");
 
     /**
      * Signals that the user input could not be parsed.
@@ -41,6 +42,8 @@ public class Parser {
      * Used for initial separation of command word and args.
      */
     public static final Pattern BASIC_COMMAND_FORMAT = Pattern.compile("(?<commandWord>\\S+)(?<arguments>.*)");
+
+	
 
     public Parser() {}
 
@@ -74,6 +77,9 @@ public class Parser {
 
             case ListCommand.COMMAND_WORD:
                 return new ListCommand();
+                
+            case TagCommand.COMMAND_WORD:
+                return prepareTag(arguments);
 
             case ViewCommand.COMMAND_WORD:
                 return prepareView(arguments);
@@ -235,5 +241,19 @@ public class Parser {
         return new FindCommand(keywordSet);
     }
 
-
+    
+    /**
+     * Parses arguments in the context of the find person command.
+     *
+     * @param args full command args string
+     * @return the prepared command
+     */
+    private Command prepareTag(String args) {
+        final Matcher matcher = TAG_ARGS_FORMAT.matcher(args.trim());
+        if (!matcher.matches()) {
+            return new IncorrectCommand(String.format(MESSAGE_INVALID_COMMAND_FORMAT,
+                    TagCommand.MESSAGE_USAGE));
+        }
+        return new TagCommand(Integer.parseInt(matcher.group("index")), matcher.group("tag"), matcher.group("toAdd").equals("+"));
+    }
 }

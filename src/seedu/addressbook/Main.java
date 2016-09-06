@@ -1,6 +1,7 @@
 package seedu.addressbook;
 
 import seedu.addressbook.data.person.ReadOnlyPerson;
+import seedu.addressbook.data.tag.Tagging;
 import seedu.addressbook.storage.StorageFile.*;
 
 import seedu.addressbook.commands.*;
@@ -39,10 +40,19 @@ public class Main {
     public void run(String[] launchArgs) {
         start(launchArgs);
         runCommandLoopUntilExitCommand();
+        printTaggingList();
         exit();
     }
-
     /**
+     * Prints out all tags that were added or removed in this session
+     */
+    private void printTaggingList() {
+		for(String tag: Tagging.getTaggingList()) {
+			ui.showToUser(tag);
+		}
+	}
+
+	/**
      * Sets up the required objects, loads up the data from the storage file, and prints the welcome message.
      *
      * @param launchArgs arguments supplied by the user at program launch
