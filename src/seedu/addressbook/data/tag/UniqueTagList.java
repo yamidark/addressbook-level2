@@ -26,7 +26,11 @@ public class UniqueTagList implements Iterable<Tag> {
      * Signals that an operation targeting a specified Tag in the list would fail because
      * there is no such matching Tag in the list.
      */
-    public static class TagNotFoundException extends Exception {}
+    public static class TagNotFoundException extends Exception {
+    	protected TagNotFoundException() {
+            super("Tag does not exist in this person");
+        }
+    }
 
     private final List<Tag> internalList = new ArrayList<>();
 

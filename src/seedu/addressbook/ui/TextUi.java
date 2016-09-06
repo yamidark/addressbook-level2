@@ -167,14 +167,4 @@ public class TextUi {
         return String.format(MESSAGE_INDEXED_LIST_ITEM, visibleIndex, listItem);
     }
     
-    /**
-     * Returns a concatenated version of the printable strings of each object.
-     */
-   private static String getPrintableString(Printable... printables){
-	   final StringBuilder printablesBuilder = new StringBuilder();
-	   for(Printable item: printables) {
-		   printablesBuilder.append(item.getPrintableString()).append(", ");
-	   }
-	   return printablesBuilder.toString();
-   }
 }

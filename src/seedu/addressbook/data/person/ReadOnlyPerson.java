@@ -13,7 +13,11 @@ public interface ReadOnlyPerson {
     Phone getPhone();
     Email getEmail();
     Address getAddress();
-
+    
+    static final int NAME_INDEX = 0;
+    static final int PHONE_INDEX = 1;
+    static final int EMAIL_INDEX = 2;
+    static final int ADDRESS_INDEX = 3;
     /**
      * The returned TagList is a deep copy of the internal TagList,
      * changes on the returned list will not affect the person's internal tags.
@@ -66,20 +70,36 @@ public interface ReadOnlyPerson {
      */
     default String getAsTextHidePrivate() {
         final StringBuilder builder = new StringBuilder();
-        builder.append(getName());
+        Printable[] printablesToPrint = new Printable[4];
+        printablesToPrint[NAME_INDEX] = getName();
         if (!getPhone().isPrivate()) {
-            builder.append(" Phone: ").append(getPhone());
+        	printablesToPrint[PHONE_INDEX] = getPhone();
         }
         if (!getEmail().isPrivate()) {
-            builder.append(" Email: ").append(getEmail());
+        	printablesToPrint[EMAIL_INDEX] = getEmail();
         }
         if (!getAddress().isPrivate()) {
-            builder.append(" Address: ").append(getAddress());
+        	printablesToPrint[ADDRESS_INDEX] = getAddress();
         }
-        builder.append(" Tags: ");
+        builder.append(getPrintableString(printablesToPrint));
+        builder.append("Tags: ");
         for (Tag tag : getTags()) {
             builder.append(tag);
         }
         return builder.toString();
     }
+    
+    /**
+     * Returns a concatenated version of the printable strings of each object.
+     */
+   static String getPrintableString(Printable... printables){
+	   final StringBuilder printablesBuilder = new StringBuilder();
+	   for(Printable item: printables) {
+		   if (item == null) {
+			   continue;
+		   }
+		   printablesBuilder.append(item.getPrintableString()).append(", ");
+	   }
+	   return printablesBuilder.toString();
+   }
 }
