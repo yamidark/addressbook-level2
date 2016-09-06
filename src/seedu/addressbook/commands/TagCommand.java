@@ -12,12 +12,17 @@ import seedu.addressbook.data.tag.UniqueTagList;
 import seedu.addressbook.data.tag.UniqueTagList.DuplicateTagException;
 import seedu.addressbook.data.tag.UniqueTagList.TagNotFoundException;
 
+/**
+ * 
+ * adds or removes a tag from a person in address book
+ *
+ */
 public class TagCommand extends Command {
 	
 	public static final String COMMAND_WORD = "tag";
 
-    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Adds or removes a tag to the person given "
-            + "Parameters: +/- index tag"
+    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Adds or removes a tag to the person given.\n"
+            + "Parameters: +/- index tag\n"
             + "Example: " + COMMAND_WORD + " + i/2 t/friend";
 
 	private static final String MESSAGE_UPDATED_TAG_SUCCESS = "Successfully updated %1$s tag";
@@ -39,11 +44,10 @@ public class TagCommand extends Command {
 			UniqueTagList updatedTags = oldPerson.getTags();
 			if (toAdd) {
 				updatedTags.add(new Tag(tagValue));
-				Tagging.addAddingTagging(updatedPerson, tagValue);
 			} else {
-				updatedTags.remove(new Tag(tagValue));
-				Tagging.addRemovingTagging(updatedPerson, tagValue);
+				updatedTags.remove(new Tag(tagValue));	
 			}
+			Tagging.addToTaggingList(updatedPerson, tagValue, toAdd);
 			addressBook.removePerson(oldPerson);
 			updatedPerson.setTags(updatedTags);
 			addressBook.addPerson(updatedPerson);

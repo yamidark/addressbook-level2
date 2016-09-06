@@ -23,6 +23,7 @@ public class Main {
 
     /** Version info of the program. */
     public static final String VERSION = "AddessBook Level 2 - Version 1.0";
+    public static final String MESSAGE_PRINT_TAGGINGLIST = "List of tags updated:";
 
     private TextUi ui;
     private StorageFile storage;
@@ -47,6 +48,7 @@ public class Main {
      * Prints out all tags that were added or removed in this session
      */
     private void printTaggingList() {
+		ui.showToUser(MESSAGE_PRINT_TAGGINGLIST);
 		for(String tag: Tagging.getTaggingList()) {
 			ui.showToUser(tag);
 		}
